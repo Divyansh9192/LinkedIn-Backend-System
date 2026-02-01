@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: connections-service
+  neo4j:
+    uri: neo4j://connections-db:7687
+    authentication:
+      username: neo4j
+      password: divyansh@04
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.LongSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+server:
+  servlet:
+    context-path: /connections
+  port: 8090
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+  instance:
+    prefer-ip-address: true

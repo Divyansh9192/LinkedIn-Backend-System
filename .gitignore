@@ -1,0 +1,150 @@
+# LinkedIn Microservices - Security-Focused .gitignore
+
+##############################################################################
+# CRITICAL: Secrets & Credentials - NEVER COMMIT THESE
+##############################################################################
+*.env
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Application properties with sensitive data
+**/application-local.properties
+**/application-dev.properties
+**/application-prod.properties
+**/application-secret.properties
+**/bootstrap-secret.yml
+
+# Database credentials
+**/database.properties
+**/db.properties
+
+# API Keys & Service Account Files
+**/secrets/
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+*.truststore
+service-account*.json
+gcp-credentials.json
+aws-credentials.json
+
+# JWT Secret Keys
+jwt-secret.txt
+jwt.key
+secret.key
+
+# SSH Keys
+id_rsa
+id_rsa.pub
+*.ppk
+
+# Cloud Provider Configs
+.aws/
+.gcp/
+.azure/
+
+# Kubernetes Secrets
+k8s/*-secret.yml
+k8s/*-secret.yaml
+k8s/secrets/
+**/secret.yml
+**/secret.yaml
+
+##############################################################################
+# Build Outputs & Dependencies - Keep repo clean
+##############################################################################
+# Maven
+target/
+**/target/
+*.jar
+*.war
+*.ear
+!.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+**/build/
+
+##############################################################################
+# IDE Files - Prevent sharing personal IDE configs
+##############################################################################
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# NetBeans
+nbproject/private/
+
+##############################################################################
+# Operating System Files
+##############################################################################
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+##############################################################################
+# Logs & Temporary Files
+##############################################################################
+logs/
+*.log
+*.log.*
+*.tmp
+*.swp
+*.bak
+*.old
+
+##############################################################################
+# Database & Data Files - Prevent data leaks
+##############################################################################
+*.db
+*.sqlite
+*.sqlite3
+data/
+pgdata/
+postgres-data/
+neo4j-data/
+redis-data/
+
+##############################################################################
+# Docker - Prevent credentials in override files
+##############################################################################
+docker-compose.override.yml
+.docker/
+
+##############################################################################
+# Backup Files - Often contain sensitive data
+##############################################################################
+*.backup
+*.dump
+*.sql
+backup/
+backups/
+
+##############################################################################
+# Test Coverage & Reports
+##############################################################################
+coverage/
+*.coverage
+test-results/

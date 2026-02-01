@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: user-service
+
+  datasource:
+    url: jdbc:postgresql://user-db:5432/userDB
+    username: xtremeneon
+    password: Divyansh@04
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: 8082
+  servlet:
+    context-path: /users
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+  instance:
+    prefer-ip-address: true
+# noinspection undefined
+jwt:
+  secretKey: as89gah907d80had9h9a7d90ha6d79h5a9dh09da09k98a6k8aey98ha896rh9

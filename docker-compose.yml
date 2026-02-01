@@ -1,0 +1,192 @@
+services:
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    networks:
+      - linkedin-network
+    environment:
+      KAFKA_NODE_ID: 0
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+  kafbat-ui:
+    container_name: kafbat-ui
+    image: ghcr.io/kafbat/kafka-ui:latest
+    ports:
+      - 8090:8081
+    depends_on:
+      - kafka
+    networks:
+      - linkedin-network
+    environment:
+      KAFKA_CLUSTER_0_NAME: local
+      KAFKA_CLUSTER_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTER_0_KSQLDBSERVER: http://ksqldb0:8088
+
+  notification-db:
+    image: postgres:16
+    container_name: notification-db
+    environment:
+      - POSTGRES_DB=${NOTIFICATION_DB_NAME:-notificationDB}
+      - POSTGRES_USER=${NOTIFICATION_DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${NOTIFICATION_DB_PASSWORD}
+    networks:
+      - linkedin-network
+    volumes:
+      - notification-db-data:/var/lib/postgresql/data
+
+  posts-db:
+    image: postgres:16
+    container_name: posts-db
+    environment:
+      - POSTGRES_DB=${POSTS_DB_NAME:-postsDB}
+      - POSTGRES_USER=${POSTS_DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTS_DB_PASSWORD}
+    networks:
+      - linkedin-network
+    volumes:
+      - posts-db-data:/var/lib/postgresql/data
+
+  user-db:
+    image: postgres:16
+    container_name: user-db
+    environment:
+      - POSTGRES_DB=${USER_DB_NAME:-userDB}
+      - POSTGRES_USER=${USER_DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${USER_DB_PASSWORD}
+    networks:
+      - linkedin-network
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+
+  connections-db:
+    image: neo4j:latest
+    container_name: connections-db
+    environment:
+      - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD}
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - connections-db-data:/data
+    networks:
+      - linkedin-network
+
+  discovery-server:
+    image: xtremeneon/discovery-server:latest
+    container_name: discovery-server
+    networks:
+      - linkedin-network
+    ports:
+      - "8761:8761"
+
+
+  notification-service:
+    image: xtremeneon/notification-service:latest
+    container_name: notification-service
+    networks:
+      - linkedin-network
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      notification-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://notification-db:5432/${NOTIFICATION_DB_NAME:-notificationDB}
+      - SPRING_DATASOURCE_USERNAME=${NOTIFICATION_DB_USER:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${NOTIFICATION_DB_PASSWORD}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_SERVER_URL:-http://discovery-server:8761/eureka}
+
+  posts-service:
+    image: xtremeneon/posts-service:latest
+    container_name: posts-service
+    networks:
+      - linkedin-network
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      posts-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://posts-db:5432/${POSTS_DB_NAME:-postsDB}
+      - SPRING_DATASOURCE_USERNAME=${POSTS_DB_USER:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${POSTS_DB_PASSWORD}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_SERVER_URL:-http://discovery-server:8761/eureka}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+
+  user-service:
+    image: xtremeneon/user-service:latest
+    container_name: user-service
+    networks:
+      - linkedin-network
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      user-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/${USER_DB_NAME:-userDB}
+      - SPRING_DATASOURCE_USERNAME=${USER_DB_USER:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${USER_DB_PASSWORD}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_SERVER_URL:-http://discovery-server:8761/eureka}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_EXPIRATION_MS=${JWT_EXPIRATION_MS:-86400000}
+
+  connections-service:
+    image: xtremeneon/connections-service:latest
+    container_name: connections-service
+    networks:
+      - linkedin-network
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      connections-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    environment:
+      - SPRING_NEO4J_URI=bolt://connections-db:7687
+      - SPRING_NEO4J_AUTHENTICATION_USERNAME=${NEO4J_USER:-neo4j}
+      - SPRING_NEO4J_AUTHENTICATION_PASSWORD=${NEO4J_PASSWORD}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_SERVER_URL:-http://discovery-server:8761/eureka}
+
+  api-gateway:
+    image: xtremeneon/api-gateway:latest
+    container_name: api-gateway
+    ports:
+      - "8083:8083"
+    networks:
+      - linkedin-network
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_SERVER_URL:-http://discovery-server:8761/eureka}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+
+networks:
+  linkedin-network:
+    driver: bridge
+
+volumes:
+  kafka_data:
+  notification-db-data:
+  posts-db-data:
+  user-db-data:
+  connections-db-data:

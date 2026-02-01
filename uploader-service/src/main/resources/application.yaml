@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: uploader-service
+
+
+server:
+  port: 9050
+  servlet:
+    context-path: /uploads
+
+cloudinary:
+  cloud-name: dejs1pmq4
+  api-key: 739792918143733
+  api-secret: pd1m9yMulTEEsLFndyWuERzJlEs
