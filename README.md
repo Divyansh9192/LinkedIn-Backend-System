@@ -440,7 +440,7 @@ LinkedIn/
 ### 1. Clone the Repository
 ```bash
 # Cloning the Repository
-git clone https://github.com/yourusername/linkedin-clone.git
+git clone https://github.com/Divyansh9192/LinkedIn-Backend-System.git
 cd linkedin-clone
 ```
 
