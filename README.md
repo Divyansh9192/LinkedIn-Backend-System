@@ -12,27 +12,27 @@ A scalable, event-driven LinkedIn clone built with microservices architecture us
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [System Architecture](#system-architecture)
-- [Tech Stack](#tech-stack)
-- [Microservices](#microservices)
-- [Database Schema](#database-schema)
-- [Project Structure](#project-structure)
+- [Overview](#-overview)
+- [Features](#-features)
+- [System Architecture](#-system-architecture)
+- [Tech Stack](#-tech-stack)
+- [Microservices](#-microservices)
+- [Database Schema](#-database-schema)
+- [Project Structure](#-project-structure)
 - [Prerequisites](#prerequisites)
-- [Installation & Setup](#installation--setup)
-- [Environment Variables](#environment-variables)
-- [Running Locally](#running-locally)
-- [API Endpoints](#api-endpoints)
-- [Authentication Flow](#authentication-flow)
-- [Event-Driven Architecture](#event-driven-architecture)
-- [Kubernetes Deployment](#kubernetes-deployment)
-- [Docker Deployment](#docker-deployment)
-- [Monitoring & Observability](#monitoring--observability)
-- [Security Considerations](#security-considerations)
-- [Scaling & Performance](#scaling--performance)
-- [Contributing](#contributing)
-- [License](#license)
+- [Installation & Setup](#-installation--setup)
+- [Environment Variables](#-environment-variables)
+- [Running Locally](#-running-locally)
+- [API Endpoints](#-api-endpoints)
+- [Authentication Flow](#-authentication-flow)
+- [Event-Driven Architecture](#-event-driven-architecture)
+- [Kubernetes Deployment](#-kubernetes-deployment)
+- [Docker Deployment](#-docker-deployment)
+- [Monitoring & Observability](#-monitoring--observability)
+- [Security Considerations](#-security-considerations)
+- [Scaling & Performance](#-scaling--performance)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ## 🎯 Overview
 
@@ -1044,7 +1044,7 @@ Contributions are welcome! Please follow these guidelines:
 - Follow Java naming conventions
 - Use Lombok annotations appropriately
 - Write meaningful commit messages
-- Add JavaDoc for public methods
+- Add Java Doc for public methods
 - Maintain consistent code formatting
 - Write tests for new features
 
