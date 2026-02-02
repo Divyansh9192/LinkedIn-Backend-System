@@ -441,7 +441,7 @@ LinkedIn/
 ```bash
 # Cloning the Repository
 git clone https://github.com/Divyansh9192/LinkedIn-Backend-System.git
-cd linkedin-clone
+cd LinkedIn-Backend-System
 ```
 
 ### 2. Build All Services
